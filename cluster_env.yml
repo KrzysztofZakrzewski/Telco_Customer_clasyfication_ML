@@ -1,0 +1,18 @@
+name: churn-env
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip=24.0
+  - numpy=1.26.4
+  - pandas
+  - seaborn=0.13.2
+  - matplotlib
+  - plotly=5.22.0
+  - ipython=8.25.0
+  - scikit-learn=1.4.2
+
+  - pip:
+      - pycaret==3.3.2
