@@ -2,19 +2,27 @@
 
 ## 🧠 Project Overview
 
-This project focuses on predicting customer churn using machine learning, with a strong emphasis on **model interpretability, iterative improvement, and practical deployment readiness**.
+This project focuses on predicting customer churn using machine learning, with a strong emphasis on:
+
+* model interpretability
+* iterative improvement
+* business-oriented evaluation
+* deployment readiness
+
+The project evolved from a simple interpretable baseline model into a comparison between linear and ensemble machine learning approaches for churn prediction.
 
 The goal was not only to build an accurate model, but also to understand:
 
-* **why customers churn**
-* **how to improve detection**
-* **how to make the model usable in a real-world application**
+* why customers churn
+* how different models behave
+* how threshold tuning changes business outcomes
+* how to prepare models for real-world deployment
 
 ---
 
-## ⚙️ Project Workflow
+# ⚙️ Project Workflow
 
-### 1. Exploratory Data Analysis (EDA)
+## 1. Exploratory Data Analysis (EDA)
 
 * Analyzed data distribution, missing values, and feature types
 * Identified key numerical features:
@@ -22,92 +30,129 @@ The goal was not only to build an accurate model, but also to understand:
   * `MonthlyCharges`
   * `TotalCharges`
   * `tenure`
-* Used binning (quantiles) to better understand relationships with churn
+
+* Used quantile binning to better understand churn patterns
 
 📌 Key insight:
 
-> Customers with short tenure and higher monthly charges are more likely to churn.
+> Customers with short tenure and higher monthly charges were significantly more likely to churn.
 
 ---
 
-### 2. Baseline Model – Logistic Regression
+# 2. Baseline Model – Logistic Regression
 
-* Built initial Logistic Regression model
-* Evaluated using:
+A Logistic Regression model was used as the initial baseline because of its simplicity and interpretability.
 
-  * Accuracy
-  * Precision / Recall
-  * ROC AUC
+The model was evaluated using:
 
-📊 Result:
+* Accuracy
+* Precision / Recall
+* ROC AUC
+
+📊 Initial Results:
 
 * Accuracy ≈ 0.82
 * Recall (churn) ≈ 0.58
 
 📌 Problem:
 
-> The model failed to detect a significant portion of churn cases.
+> The default model failed to detect a significant portion of churn cases.
 
 ---
 
-### 3. Threshold Tuning
+# 3. Threshold Tuning
 
-Instead of using the default threshold (0.5), different thresholds were tested:
+Instead of relying on the default classification threshold (0.5), multiple thresholds were tested to improve churn detection performance.
 
-* 0.5 → recall = 0.58
+Threshold comparison:
+
+* 0.5 → recall ≈ 0.56
 * 0.4 → recall ≈ 0.68
-* 0.3 → recall ≈ 0.79 (but too many false positives)
+* 0.3 → recall ≈ 0.80 (but too many false positives)
 
 📌 Decision:
 
-> Threshold = **0.4** provides the best balance between recall and precision.
+> Threshold = 0.4 provided the best balance between recall and precision.
 
 ---
 
-### 4. Model Simplification – L1 Regularization
+# 4. Model Simplification – L1 Regularization
 
-Applied L1 penalty to:
+L1 regularization was applied to:
 
 * reduce feature space
+* simplify the model
 * improve interpretability
 
-📌 Result:
+📌 Results:
 
-* many coefficients reduced to zero
-* model became simpler
+* many coefficients were reduced to zero
+* model complexity decreased
 * performance remained stable
 
 ---
 
-### 5. Final Model
+# 5. Advanced Model – Gradient Boosting
 
-Final configuration:
+To explore non-linear relationships and potentially improve predictive performance, a Gradient Boosting Classifier was introduced.
 
-* Model: **Logistic Regression (L1)**
-* Threshold: **0.4**
+The following parameters were tuned:
+
+* `learning_rate`
+* `n_estimators`
+* classification threshold
+
+### Final Configuration
+
+* learning_rate = 0.05
+* n_estimators = 100
+* threshold = 0.4
 
 📊 Performance:
 
-* Accuracy ≈ 0.80
-* Recall (churn) ≈ 0.68
-* AUC ≈ 0.85
+* ROC AUC ≈ 0.86
+* Recall ≈ 0.68
+* Precision ≈ 0.64
 
-📌 Key takeaway:
+📌 Key insight:
 
-> Improved churn detection while maintaining model simplicity.
+> Gradient Boosting improved the balance between recall and precision while maintaining strong overall generalization performance.
 
 ---
 
-### 6. Cross-Validation
+# 6. Feature Importance Analysis
 
-Performed 10-fold cross-validation:
+Gradient Boosting feature importance identified:
 
-* AUC range: ~0.82 – 0.87
-* Mean AUC: ~0.84
+* tenure
+* contract type
+* internet service type
+* payment method
+
+as the strongest churn predictors.
+
+📌 Additional experiment:
+
+Features with near-zero importance were removed and tested again.
+
+Result:
+
+> Removing weak predictors produced almost identical results, suggesting that the Gradient Boosting model already handled low-information features effectively.
+
+---
+
+# 7. Cross-Validation
+
+10-fold cross-validation was performed to validate model stability and generalization performance.
+
+📊 Results:
+
+* Mean ROC AUC ≈ 0.85
+* Standard deviation ≈ 0.013
 
 📌 Insight:
 
-> The model is stable and generalizes well to unseen data.
+> The model demonstrated stable performance across different data splits and generalized consistently to unseen data.
 
 ---
 
@@ -138,6 +183,7 @@ Using Logistic Regression coefficients:
 
 The final model was exported using `joblib` along with:
 
+* trained model
 * selected features
 * classification threshold
 
@@ -145,28 +191,50 @@ This allows easy integration into an application (e.g. Streamlit app).
 
 ---
 
+# 🧪 Interactive Testing
+
+The notebook includes a commented playground section that allows testing custom customer scenarios.
+
+Users can modify:
+
+* contract type
+* tenure
+* payment method
+* internet services
+
+and observe how predictions change across different models.
+
+---
+
 ## 🧩 Key Lessons
 
-* **Threshold tuning can be more impactful than changing models**
-* **Model simplicity (L1) improves usability without hurting performance**
-* **AUC evaluates model quality, while threshold defines business behavior**
-* **Understanding the model is more valuable than just using it**
+* Threshold tuning can significantly improve business-oriented performance
+* Logistic Regression provides strong interpretability and simplicity
+* Gradient Boosting improves predictive flexibility and class separation
+* ROC AUC measures ranking quality, while thresholds define business behavior
+* Feature importance and regularization help simplify models without major performance loss
 
 ---
 
 ## 📌 Final Conclusion
 
-This project demonstrates a complete ML workflow:
-
 * from data exploration
-* through model building and optimization
-* to a deployable solution
+* through model development and tuning
+* to model comparison and deployment preparation
 
-The final model strikes a balance between:
+Both Logistic Regression and Gradient Boosting were evaluated not only on raw metrics, but also on:
 
-* performance
+* interpretability
+* generalization
+* deployment usability
+* business practicality
+
+The final solution balances:
+
+* predictive performance
 * interpretability
 * practical usability
+* deployment readiness
 
 ---
 
